@@ -336,7 +336,46 @@ todo--> toh ab humari problem hai ki humein show karna hai kaunsi book kaunse st
     ]
 
 
+! Question: Oopar jo "studentData" naam se array bani hai or usmein student ki details aa rahi hain object ke andar, main chahta hoon ki woh "studentData" jo array of objects mein aa raha hai, woh bas object ki form mein aaye bas naa ki array of object mein.
+^ Solution: iske liye hum "$unwind" operator kaa use karenge, jisse ki array kaa data bahar aa jaayega, or ab array mein nahin rahega.
 
+^ CODE-2
+    db.library.aggregate([
+        {
+            $lookup: {
+                from: "students",
+                localField: "student_id",
+                foreignField: "_id",
+                as: "studentData"
+            }
+        },
+
+        { $unwind: "$studentData" } // "studentData" field array tha pehle, ab ek object ban gaya hai, see below output:
+    ]) 
+
+^ OUTPUT: 
+    [
+        {
+            _id: ObjectId('682ab6e9dec65c85646c4bd0'),
+            book: 'JavaScript: The Good Parts',
+            student_id: ObjectId('6824bfdf69c19216f06c4bd0'),
+            studentData: {
+            _id: ObjectId('6824bfdf69c19216f06c4bd0'),
+            name: 'Prashant',
+            age: 24,
+            class: 'B.Tech',
+            skills: [ 'Javascript', 'Expressjs', 'Nodejs' ]
+            }
+        },
+        .
+        .
+        .
+        /Neeche or bhi data hai, lengthy hai isliye bas ek hi response rakha hai/
+    ] 
+        
+
+
+]
 */
 
 
