@@ -374,7 +374,154 @@ todo--> toh ab humari problem hai ki humein show karna hai kaunsi book kaunse st
     ] 
         
 
+! Question: oopar humne output mein dekha tha ki "studentData" naam ki array ban rahi thi, uss array mein fir ek object the jismein student ki details thi, and array ke bahar book ki details and student id bhi thi, toh yeh thodi readability ko kam kar raha hai, kyon naa poori details ko ek object mein show kara de like below:
+[    
+  {
+    _id: ObjectId('682ab6e9dec65c85646c4bd0'),
+    name: 'Prashant',
+    age: 24,
+    class: 'B.Tech',
+    skills: [ 'Javascript', 'Expressjs', 'Nodejs' ],
+    book: 'JavaScript: The Good Parts',
+    student_id: ObjectId('6824bfdf69c19216f06c4bd0')
+  },
+]
 
+^ Aisa kuch karne ke liye hum "$replaceRoot" operator kaa use karenge, and iske andar bhi hum nested operators kaa use karte hain (i.e., newRoot, $mergeObjects, $arrayElemAt, $$ROOT)
+
+^ CODE-3
+~   db.library.aggregate([
+~       {
+~           $lookup: {
+~               from: "students",
+~               localField: "student_id",
+~               foreignField: "_id",
+~               as: "studentData"
+~           }
+~       },
+~   
+~       {
+~           $replaceRoot: {
+~               newRoot: {
+~                   $mergeObjects: [ // yeh wala operator array ke andar objects expect karta hai, kyoki yeh objects ko hi merge karta hai  
+~                       {
+~                           $arrayElemAt: ["$studentData", 0] // studentData wali array mein "0" index
+~                       },
+~   
+~                       "$$ROOT" // yeh operator jo hai oopar wala jo data hai "studentData" wali array ke alawa, usko fetch karega, and oopar "mergeObjects" wala operator jo hai "studentData" wali array mein se data lega, and then dono ke dono marge ho jaayenge and ek object mein return ho jaayenge, see the OUTPUT below:
+~                   ]
+~               }
+~           }
+~       },
+~   
+~       {
+~           $project: {
+~               studentData: 0 // studentData wale field ko show nahin karenge, kyoki uska data toh ab humne bahar nikal ke object mein merge kar diya hai, toh wahi same data baar baar kyon dikhana hai, and humne iss array of object wale data ko hi toh bahar nikala hai jisse ki readabilit badh jaaye
+~           }
+~       }
+~   ])
+
+^ OUTPUT:
+[
+  {
+    _id: ObjectId('682ab6e9dec65c85646c4bd0'),
+    name: 'Prashant',
+    age: 24,
+    class: 'B.Tech',
+    skills: [ 'Javascript', 'Expressjs', 'Nodejs' ],
+    book: 'JavaScript: The Good Parts',
+    student_id: ObjectId('6824bfdf69c19216f06c4bd0')
+  },
+  {
+    _id: ObjectId('682ab6e9dec65c85646c4bd1'),
+    name: 'Amit',
+    age: 19,
+    class: 'B.Sc',
+    skills: [ 'Javascript', 'Expressjs', 'Nodejs' ],
+    book: 'You Don’t Know JS',
+    student_id: ObjectId('6824c06d69c19216f06c4bd1')
+  },
+  {
+    _id: ObjectId('682ab6e9dec65c85646c4bd2'),
+    name: 'Sneha',
+    age: 20,
+    class: 'B.Com',
+    skills: [ 'Javascript', 'Expressjs', 'Nodejs' ],
+    book: 'Eloquent JavaScript',
+    student_id: ObjectId('6824c06d69c19216f06c4bd2')
+  },
+  {
+    _id: ObjectId('682ab6e9dec65c85646c4bd3'),
+    name: 'Rahul',
+    age: 21,
+    class: 'B.Tech',
+    skills: [ 'Javascript', 'Expressjs', 'Nodejs' ],
+    book: 'Node.js Design Patterns',
+    student_id: ObjectId('6824c06d69c19216f06c4bd3')
+  },
+  {
+    _id: ObjectId('682ab6e9dec65c85646c4bd4'),
+    name: 'Neha',
+    age: 22,
+    class: 'M.Tech',
+    skills: [ 'Javascript', 'Expressjs', 'Nodejs' ],
+    book: 'Clean Code',
+    student_id: ObjectId('6824c06d69c19216f06c4bd4')
+  },
+  {
+    _id: ObjectId('682ab6e9dec65c85646c4bd5'),
+    name: 'Vikram',
+    age: 24,
+    class: 'BCA',
+    skills: [ 'Javascript', 'Expressjs', 'Nodejs' ],
+    book: 'Designing APIs with Node.js',
+    student_id: ObjectId('6824c06d69c19216f06c4bd5')
+  },
+  {
+    _id: ObjectId('682ab6e9dec65c85646c4bd6'),
+    name: 'Pooja',
+    age: 23,
+    class: 'MBA',
+    skills: [ 'Javascript', 'Expressjs', 'Nodejs' ],
+    book: 'Mastering Express.js',
+    student_id: ObjectId('6824c06d69c19216f06c4bd6')
+  },
+  {
+    _id: ObjectId('682ab6e9dec65c85646c4bd7'),
+    name: 'Karan',
+    age: 20,
+    class: 'BBA',
+    skills: [ 'Javascript', 'Expressjs', 'Nodejs' ],
+    book: 'MongoDB: The Definitive Guide',
+    student_id: ObjectId('6824c06d69c19216f06c4bd7')
+  },
+  {
+    _id: ObjectId('682ab6e9dec65c85646c4bd8'),
+    name: 'Simran',
+    age: 19,
+    class: 'B.Sc',
+    skills: [ 'Javascript', 'Expressjs', 'Nodejs' ],
+    book: 'Learning Web Design',
+    student_id: ObjectId('6824c06d69c19216f06c4bd8')
+  },
+  {
+    _id: ObjectId('682ab6e9dec65c85646c4bd9'),
+    name: 'Rohit',
+    age: 21,
+    class: 'B.Tech',
+    skills: [ 'Javascript', 'Expressjs', 'Nodejs' ],
+    book: 'The Pragmatic Programmer',
+    student_id: ObjectId('6824c06d69c19216f06c4bd9')
+  },
+  {
+    _id: ObjectId('682ab6e9dec65c85646c4bda'),
+    name: 'Anjali',
+    age: 24,
+    class: 'MCA',
+    skills: [ 'Javascript', 'Expressjs', 'Nodejs' ],
+    book: 'Fullstack Node.js',
+    student_id: ObjectId('6824c06d69c19216f06c4bda')
+  }
 ]
 */
 
