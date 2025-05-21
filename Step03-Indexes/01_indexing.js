@@ -59,6 +59,8 @@ todo--> Pehle toh shuru se shuru karte hain, bina indexing ke kaise search hota 
 [amit@gmail.com, dev@gmail.com]   [prashant@google.com, rohit@outlook.com, sumit@gmail.com, yash@gmail.com]
 
 
+^--> Isko hum "IXSCAN" kehte hain, i.e. 'index scanning', jaise oopar bina indexing wale concept ko "collscan" kehte hain.
+
 !Important:
 5. As we know ki indexing jo hai storage leta hai memory mein, toh har ek field par indexing laga can be very costly, isliye kisi specific
     field par hi indexing apply karte hain.
